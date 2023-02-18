@@ -4,7 +4,7 @@ using AngleSharp.Html.Parser;
 
 namespace umlaut
 {
-    public class HHRuAPI
+    public class HHruAPI
     {
         private readonly HttpClient _httpClient = new();
         public async Task<string> getRawPage(int pageNumber)
