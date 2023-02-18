@@ -26,7 +26,5 @@
 
         public string? ResumeLink { get; set; }
 
-
-
     }
 }

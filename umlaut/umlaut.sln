@@ -10,6 +10,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBModels", "DBModels\DBModels.csproj", "{0AAB2B23-ED1B-4A0F-8F9C-001EE830C642}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBContext", "DBContext\DBContext.csproj", "{F85434EC-5FD7-4163-9F03-CD0F04B1B5B7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0AAB2B23-ED1B-4A0F-8F9C-001EE830C642} = {0AAB2B23-ED1B-4A0F-8F9C-001EE830C642}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

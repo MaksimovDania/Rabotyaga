@@ -1,14 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using DBModels;
 
 namespace DBContext
 {
     public class DataBaseContext: DbContext
     {
-        private const string Host = "localhost";
-        private const string Port = "5432";
-        private const string database = "Laba6db";
+        private const string Host = "";
+        private const string Port = "";
+        private const string database = "Umlaut";
         private const string Username = "postgres";
-        private const string Password = "Fndya21003";
+        private const string Password = "";
 
         public DbSet<Graduate> Graduates { get; set; }
 
@@ -19,7 +20,6 @@ namespace DBContext
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseNpgsql($"Host={Host};Port={Port};Database={database};Username={Username};Password={Password}");
-            //добавить константу
         }
     }
 }
