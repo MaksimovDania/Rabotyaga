@@ -1,6 +1,6 @@
 using umlaut;
 
-HHRuAPI api = new HHRuAPI();
+HHruAPI api = new HHruAPI();
 
 var hrefs = await api.GetProfileHrefs(1);
 
