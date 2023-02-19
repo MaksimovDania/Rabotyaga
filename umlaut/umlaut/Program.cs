@@ -6,14 +6,13 @@ using umlaut;
 
 HHruAPI api = new HHruAPI();
 
-var hrefs = await api.GetProfileHrefs();
+
+//var g = await api.GetGraduate("bb5b392d0003daf91e009253956e434d373238");
 
 
-foreach (var href in hrefs)
-{
-    Console.WriteLine(href);
-}
-Console.WriteLine(hrefs.Count());
+var g = await api.GetGraduate("7dfc8c65000721c83c00925395324e39317554");
+
+
 
 
 
