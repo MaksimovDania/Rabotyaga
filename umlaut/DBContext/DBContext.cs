@@ -13,6 +13,12 @@ namespace DBContext
 
         public DbSet<Graduate> Graduates { get; set; }
 
+        public DbSet<Faculties> Faculties { get; set; }
+
+        public DbSet<Locations> Locations { get; set; }
+
+        public DbSet<Specializations> Specializations { get; set; }
+
         public DataBaseContext()
         {
             Database.EnsureCreated();
