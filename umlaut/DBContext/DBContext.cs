@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
+using DBModels;
 namespace DBContext
 {
     public class DataBaseContext: DbContext

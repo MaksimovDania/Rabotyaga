@@ -1,15 +1,19 @@
 ﻿using AngleSharp;
+using AngleSharp.Browser;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
+using System;
 
 namespace umlaut
 {
     public class HHruAPI
     {
+        private HtmlParser parser = new HtmlParser();
+
         private readonly HttpClient _httpClient = new();
-        public async Task<string> getRawPage(int pageNumber)
+        public async Task<string> getByAgePage(int age, int page)
         {
-            var rez = await SendGetRequest($"https://hh.ru/search/resume?university=38921&relocation=living_or_relocation&gender=unknown&text=&exp_period=all_time&logic=normal&no_magic=true&order_by=relevance&ored_clusters=true&pos=full_text&items_on_page=20&search_period=0&page={pageNumber}");
+            var rez = await SendGetRequest($"https://hh.ru/search/resume?education_level=higher&university=38921&label=only_with_age&relocation=living_or_relocation&age_from={age}&age_to={age}&gender=unknown&text=&isDefaultArea=true&exp_period=all_time&logic=normal&pos=full_text&from=employer_index_header&search_period=&page={page}");
             return await rez.Content.ReadAsStringAsync();
         }
 
@@ -24,24 +28,42 @@ namespace umlaut
             return rez;
         }
 
-        public async Task<IEnumerable<string>> GetProfileHrefs(int num)
+        private async Task<string> GetRawVacation(string href)
         {
-            List<string> hrefTags = new List<string>();
+            var rez = await SendGetRequest($"https://hh.ru/resume/{href}");
+            return await rez.Content.ReadAsStringAsync();
+        }
 
-            var parser = new HtmlParser();
-            for (int i = 0; i < 250; i++)
+        public async Task<IEnumerable<string>> GetAllHrefsForAge(int age)
+        {
+            IEnumerable<string> links = new List<string>();
+            var document = parser.ParseDocument(await getByAgePage(age, 0));
+            var batons = document.QuerySelectorAll("a.bloko-button span").Select(span => span.InnerHtml).ToList();
+            links = links.Concat(document.QuerySelectorAll("a.serp-item__title").Select(elem => elem.GetAttribute("href").Substring(8, 38)));
+            if (int.TryParse(batons[^2], out  int pagesNumber))
             {
-                var document = parser.ParseDocument(await getRawPage(i));
-                foreach (IElement element in document.QuerySelectorAll("a"))
+                for(int i = 1; i < pagesNumber; i++)
                 {
-                    if (element.GetAttribute("href").StartsWith("/resume/"))
-                        hrefTags.Add(element.GetAttribute("href"));
+                    document = parser.ParseDocument(await getByAgePage(age, i));
+                    links = links.Concat(document.QuerySelectorAll("a.serp-item__title").Select(elem => elem.GetAttribute("href").Substring(8, 38)));
                 }
+            }
+            return links;
+        }
+
+        public async Task<IEnumerable<string>> GetProfileHrefs()
+        {
+            IEnumerable<string> links = new List<string>();
+
+            for (int i = 20; i < 65; i++)
+            {
+                links = links.Concat(await GetAllHrefsForAge(i));
                 Console.WriteLine(i);
             }
-            
 
-            return hrefTags;
+            return links;
         }
+
+
     }
 }

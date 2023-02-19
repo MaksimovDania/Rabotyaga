@@ -1,8 +1,13 @@
+using AngleSharp;
+using AngleSharp.Dom;
+using AngleSharp.Html;
+using AngleSharp.Html.Parser;
 using umlaut;
 
 HHruAPI api = new HHruAPI();
 
-var hrefs = await api.GetProfileHrefs(1);
+var hrefs = await api.GetProfileHrefs();
+
 
 foreach (var href in hrefs)
 {
