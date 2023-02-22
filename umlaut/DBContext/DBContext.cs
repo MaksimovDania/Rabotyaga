@@ -27,5 +27,13 @@ namespace DBContext
         {
             optionsBuilder.UseNpgsql($"Host={Host};Port={Port};Database={database};Username={Username};Password={Password}");
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Graduate>().HasIndex(u => u.ResumeLink).IsUnique();
+            modelBuilder.Entity<Locations>().HasIndex(u => u.Location).IsUnique();
+            modelBuilder.Entity<Specializations>().HasIndex(u => u.Specialization).IsUnique();
+            modelBuilder.Entity<Faculties>().HasIndex(u => u.Faculty).IsUnique();
+        }
     }
 }
