@@ -5,11 +5,11 @@ namespace DBContext
 {
     public class DataBaseContext: DbContext
     {
-        private const string Host = "";
-        private const string Port = "";
-        private const string database = "Umlaut";
-        private const string Username = "postgres";
-        private const string Password = "";
+        private readonly string Host = "0xc00007b.site";
+        private readonly string Port = "28008";
+        private readonly string Database_name = "Umlaut";
+        private readonly string Username = "postgres";
+        private readonly string Password = "";
 
         public DbSet<Graduate> Graduates { get; set; }
 
@@ -25,7 +25,7 @@ namespace DBContext
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql($"Host={Host};Port={Port};Database={database};Username={Username};Password={Password}");
+            optionsBuilder.UseNpgsql($"Host={Host};Port={Port};Database={Database_name};Username={Username};Password={Password}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
