@@ -13,5 +13,8 @@ namespace DBModels
 
         //Факультет
         public string? Faculty { get; set; }
+
+        //Все выпускники конкретного факультета
+        public List<Graduate> Graduate { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace DBModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DBModels
 {
     public class Graduate
     {
@@ -6,16 +8,15 @@
         public int Id { get; set; }
 
         //Внешний ключ на город выпусника
-        public int LocationsId { get; set; }
-        public Locations Locations { get; set; }
+        [Required]
+        public Locations Location { get; set; }
 
         //Внешний ключ на факультет выпусника
-        public int FacultiesId { get; set; }
-        public Faculties Faculties { get; set; }
+        [Required]
+        public Faculties Faculty { get; set; }
 
         //Внешний ключ на специализации выпусника
-        public List<int> SpecializationsId { get; set; }
-        public List<Specializations> Specializations { get; set; }
+        public List<Specializations> Specialization { get; set; }
 
         //Пол
         public string? Gender { get; set; }

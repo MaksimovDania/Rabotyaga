@@ -13,5 +13,8 @@ namespace DBModels
 
         //Город
         public string Location { get; set; }
+
+        //Все выпускники в конкретном городе
+        public List<Graduate> Graduate { get; set; }
     }
 }

@@ -13,5 +13,8 @@ namespace DBModels
 
         //Специализация
         public string Specialization { get; set; }
+
+        //Все выпускники конкретной специализации
+        public List<Graduate> Graduate { get; set; }
     }
 }
