@@ -31,7 +31,7 @@ namespace DBModels
         public int ExpectedSalary { get; set; }
 
         //Год окончания обучения
-        public string? YearGraduation { get; set; }
+        public int YearGraduation { get; set; }
 
         //Стаж
         public int Experience { get; set; }

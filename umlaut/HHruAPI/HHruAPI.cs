@@ -32,7 +32,7 @@ namespace umlaut
             return rez;
         }
 
-        private async Task<IHtmlDocument> GetRawResume(string href)
+        private async Task<IHtmlDocument> GetResume(string href)
         {
             var rez = await SendGetRequest($"https://hh.ru/resume/{href}");
             return parser.ParseDocument(await rez.Content.ReadAsStringAsync());
@@ -40,37 +40,38 @@ namespace umlaut
 
         public async Task<Graduate> GetGraduate(string href)
         {
-            var document = await GetRawResume(href);
+            var rez = new Graduate();
+            var document = await GetResume(href);
             var title = document.QuerySelector("div.resume-header-title");
-            var gender = title.QuerySelector("span[data-qa='resume-personal-gender']").InnerHtml;
-            var age = int.Parse(title.QuerySelector("span[data-qa='resume-personal-age'] span").InnerHtml.Substring(0, 2));
-            var location = title.QuerySelector("span[data-qa='resume-personal-address']").InnerHtml;
-            int salary;
+            rez.Gender = title.QuerySelector("span[data-qa='resume-personal-gender']").InnerHtml;
+            rez.Age = int.Parse(title.QuerySelector("span[data-qa='resume-personal-age'] span").InnerHtml.Substring(0, 2));
+            rez.Location = new Locations { Location = title.QuerySelector("span[data-qa='resume-personal-address']").InnerHtml };
+
             var salaryRaw = document.QuerySelector("span.resume-block__salary"); // проверть на нуль и запарсить
             if (salaryRaw is null)
-                salary = 0;
+                rez.ExpectedSalary = 0;
             else
-                salary = int.Parse(Regex.Replace(salaryRaw.InnerHtml.Substring(0, salaryRaw.InnerHtml.IndexOf('<')), @"\s+", String.Empty));
+                rez.ExpectedSalary = int.Parse(Regex.Replace(salaryRaw.InnerHtml.Substring(0, salaryRaw.InnerHtml.IndexOf('<')), @"\s+", String.Empty));
 
-            int experience;
             var experienceRaw = document.QuerySelectorAll("span.resume-block__title-text_sub span").Select(a => a.InnerHtml).ToList();
             if (experienceRaw.Any())
-                experience = int.Parse(experienceRaw[0].Substring(0, experienceRaw[0].IndexOf("<")));
+                rez.Experience = int.Parse(experienceRaw[0].Substring(0, experienceRaw[0].IndexOf("<")));
             else
-                experience = 0;
+                rez.Experience = 0;
 
-            var vacation = document.QuerySelector("div.resume-block__title-text-wrapper h2  span.resume-block__title-text[data-qa='resume-block-title-position']").InnerHtml;
-            var specs = document.QuerySelectorAll("li.resume-block__specialization").Select(a => a.InnerHtml).ToList();
+            rez.Vacation = document.QuerySelector("div.resume-block__title-text-wrapper h2  span.resume-block__title-text[data-qa='resume-block-title-position']").InnerHtml;
+            rez.Specialization = document.QuerySelectorAll("li.resume-block__specialization").Select(a => new Specializations { Specialization = a.InnerHtml}).ToList();
             var bmstu = document.QuerySelectorAll("div.resume-block[data-qa='resume-block-education'] div.bloko-columns-row div.resume-block-item-gap")
                                 .FirstOrDefault(a => a.QuerySelector("a").InnerHtml.Contains("Баумана"));
-            var year = int.Parse(bmstu.QuerySelector("div.bloko-column_l-2").InnerHtml);
-            var Faculty = bmstu.QuerySelector("div[data-qa='resume-block-education-organization']").InnerHtml;
+            rez.YearGraduation = int.Parse(bmstu.QuerySelector("div.bloko-column_l-2").InnerHtml);
+            rez.Faculty = new Faculties { Faculty = bmstu.QuerySelector("div[data-qa='resume-block-education-organization']").InnerHtml };
 
-            return null;
+            return rez;
         }
-        public async Task<IEnumerable<string>> GetAllHrefsForAge(int age)
+        private async Task<IEnumerable<string>> GetAllHrefsForAge(int age)
         {
             IEnumerable<string> links = new List<string>();
+            Console.WriteLine(age);
             var document = await getByAgePage(age, 0);
             var batons = document.QuerySelectorAll("a.bloko-button span").Select(span => span.InnerHtml).ToList();
             links = links.Concat(document.QuerySelectorAll("a.serp-item__title").Select(elem => elem.GetAttribute("href").Substring(8, 38)));
@@ -89,11 +90,24 @@ namespace umlaut
         {
             IEnumerable<string> links = new List<string>();
 
-            for (int i = 20; i < 65; i++)
+            //List<Task<IEnumerable<string>>> tasks = new();
+            //for (int i = 20; i < 30; i++)
+            //{
+            //   tasks.Add(GetAllHrefsForAge(i));
+            //}
+
+            //IEnumerable<string>[] lists = await Task.WhenAll(tasks);
+
+            //foreach (var list in lists)
+            //{
+            //    links = links.Concat(list);
+            //}
+
+            for (int i = 20; i < 80; i++)
             {
                 links = links.Concat(await GetAllHrefsForAge(i));
-                Console.WriteLine(i);
             }
+
 
             return links;
         }
