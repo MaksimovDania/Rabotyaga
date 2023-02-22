@@ -30,46 +30,33 @@ namespace DBContext
             List<Specializations> list = db.Specializations.ToList();
             return list;
         }
-        void CreateGraduate(string gender, int age, string location, string vacation, List<string> specialization,
-                            int expectedSalary, int experience, string yearGraduation, string faculty, string resumeLink)
+        void CreateGraduate(Graduate g)
         {
-            CreateFaculty(faculty);
-            CreateLocation(location);
-            var s = new List<Specializations>();
-            foreach (var item in specialization)
-            {
+            CreateFaculty(g.Faculty);
+            CreateLocation(g.Location);
+            foreach (var item in g.Specialization)
                 CreateSpecialization(item);
-                s.Add(db.Specializations.FirstOrDefault(u => u.Specialization == item));
-            }
-            var f = db.Faculties.FirstOrDefault(u => u.Faculty == faculty);
-            var l = db.Locations.FirstOrDefault(u => u.Location == location);
-            Graduate g = new Graduate { Gender = gender, Age = age, Location = l , Vacation = vacation, Specialization = s, 
-                                        ExpectedSalary = expectedSalary, Experience = experience, YearGraduation = yearGraduation, 
-                                        Faculty = f, ResumeLink = resumeLink };
             db.Graduates.Add(g);
             db.SaveChanges();
         }
-        void CreateFaculty(string faculty)
+        void CreateFaculty(Faculties f)
         {
-            if (faculty == String.Empty)
+            if (f.Faculty == String.Empty)
                 throw new ArgumentException();
-            Faculties f = new Faculties { Faculty = faculty };
             db.Faculties.Add(f);
             db.SaveChanges();
         }
-        void CreateLocation(string location)
+        void CreateLocation(Locations l)
         {
-            if (location == String.Empty)
+            if (l.Location == String.Empty)
                 throw new ArgumentException();
-            Locations l = new Locations { Location = location };
             db.Locations.Add(l);
             db.SaveChanges();
         }
-        void CreateSpecialization(string specialization)
+        void CreateSpecialization(Specializations s)
         {
-            if (specialization == String.Empty)
+            if (s.Specialization == String.Empty)
                 throw new ArgumentException();
-            Specializations s = new Specializations { Specialization = specialization };
             db.Specializations.Add(s);
             db.SaveChanges();
         }
@@ -97,24 +84,18 @@ namespace DBContext
             db.Specializations.Remove(s);
             db.SaveChanges();
         }
-        void UpdateGraduate(string gender, int age, string location, string vacation, List<string> specialization,
-                            int expectedSalary, int experience, string yearGraduation, string faculty, string resumeLink)
+        void UpdateGraduate(Graduate newG)
         {
-            var g = db.Graduates.FirstOrDefault(u => u.ResumeLink == resumeLink);
-            var f = db.Faculties.FirstOrDefault(u => u.Faculty == faculty);
-            var l = db.Locations.FirstOrDefault(u => u.Location == location);
-            var s = new List<Specializations>();
-            foreach (var item in specialization)
-                s.Add(db.Specializations.FirstOrDefault(u => u.Specialization == item));
-            g.Gender = gender;
-            g.Age = age;
-            g.Location = l;
-            g.Vacation = vacation;
-            g.Specialization = s;
-            g.ExpectedSalary = expectedSalary;
-            g.Experience = experience;
-            g.YearGraduation = yearGraduation;
-            g.Faculty = f;
+            var g = db.Graduates.FirstOrDefault(u => u.ResumeLink == newG.ResumeLink);
+            g.Gender = newG.Gender;
+            g.Age = newG.Age;
+            g.Location = newG.Location;
+            g.Vacation = newG.Vacation;
+            g.Specialization = newG.Specialization;
+            g.ExpectedSalary = newG.ExpectedSalary;
+            g.Experience = newG.Experience;
+            g.YearGraduation = newG.YearGraduation;
+            g.Faculty = newG.Faculty;
             db.Entry(g).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             db.SaveChanges();
         }
