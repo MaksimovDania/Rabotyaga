@@ -29,7 +29,7 @@ Specialization соотносится с Graduate связью многие ко
 
 Graduate содержит следующие поля: Id, Gender, Age, Vacation, ExpectedSalary, LocationID, YearGraduation, FacultyID, Experience, ResumeLink, SpecializationsIDs
 
-![alt text](https://git.iu7.bmstu.ru/sgn3-prog/sgn3-prog-it-2023/team-umlaut/umlaut-main/-/blob/feature/3-readme/umlaut/Sourse/drawSQL-o-database.png)
+![alt text](/umlaut/Sourse/drawSQL-o-database.png)
 
 ### Краткое описание алгоритма работы написанного кода
 
