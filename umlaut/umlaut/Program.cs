@@ -42,7 +42,6 @@ builder.Services.AddQuartz(q =>
             .WithSimpleSchedule(x => x
                 .WithIntervalInSeconds(10)
                 .RepeatForever())
-            .WithDescription("my awesome trigger configured for a job with single call")
         );
 });
 
