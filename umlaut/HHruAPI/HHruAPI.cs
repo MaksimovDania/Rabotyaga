@@ -40,6 +40,7 @@ namespace umlaut
 
         public async Task<Graduate> GetGraduate(string href)
         {
+            Console.WriteLine("fired");
             var rez = new Graduate();
             var document = await GetResume(href);
             var title = document.QuerySelector("div.resume-header-title");
