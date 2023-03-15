@@ -19,9 +19,9 @@ using umlaut.GraduateDBUpdaterBGService;
 //    Console.WriteLine(item);
 //}
 
-
-
 var builder = WebApplication.CreateBuilder(args);
+
+Console.WriteLine(builder.Configuration.GetConnectionString("StackOverflow"));
 
 // Add services to the container.
 
@@ -29,7 +29,6 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddTransient<HHruAPI>();
 builder.Services.AddTransient<GraduateDBUpdateJob>();
 
@@ -37,7 +36,6 @@ builder.Services.AddQuartz(q =>
 {
     q.UseMicrosoftDependencyInjectionJobFactory();
     q.ScheduleJob<GraduateDBUpdateJob>(trigger => trigger
-            .WithIdentity("Combined Configuration Trigger")
             .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(1)))
             .WithSimpleSchedule(x => x
                 .WithIntervalInSeconds(10)
@@ -59,6 +57,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 

@@ -5,10 +5,10 @@ namespace DBContext
 {
     public class DataBaseContext: DbContext
     {
-        private readonly string Host = "0xc00007b.site";
-        private readonly string Port = "28008";
-        private readonly string Database_name = "Umlaut";
-        private readonly string Username = "postgres";
+        private readonly string Host = "95.165.158.58";
+        private readonly string Port = "28009";
+        private readonly string Database_name = "GradiateDBtest";
+        private readonly string Username = "umlaut-super";
         private readonly string Password = "";
 
         public DbSet<Graduate> Graduates { get; set; }
