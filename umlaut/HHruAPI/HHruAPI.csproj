@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DBModels\DBModels.csproj" />
+    <ProjectReference Include="..\Umlaut.Database\Umlaut.Database.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using umlaut.Database.Models;
+using Umlaut.Database.Models;
 
 
-namespace umlaut.Database
+namespace Umlaut.Database
 
 {
     public class UmlautDBContext: DbContext
     {
         private readonly string Host = "95.165.158.58";
         private readonly string Port = "28009";
-        private readonly string Database_name = "GradiateDBtest";
+        private readonly string Database_name = "GraduateDBtest";
         private readonly string Username = "umlaut-super";
         private readonly string Password = "";
 

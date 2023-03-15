@@ -2,9 +2,11 @@ using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html;
 using AngleSharp.Html.Parser;
+using Microsoft.EntityFrameworkCore;
 using Quartz;
 using umlaut;
 using umlaut.GraduateDBUpdaterBGService;
+using Umlaut.Database;
 
 //HHruAPI api = new HHruAPI();
 
@@ -20,13 +22,12 @@ using umlaut.GraduateDBUpdaterBGService;
 //}
 
 var builder = WebApplication.CreateBuilder(args);
-
-Console.WriteLine(builder.Configuration.GetConnectionString("StackOverflow"));
-
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+var connectionString = builder.Configuration.GetConnectionString("PostgresGraduate");
+builder.Services.AddDbContext<UmlautDBContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<HHruAPI>();
