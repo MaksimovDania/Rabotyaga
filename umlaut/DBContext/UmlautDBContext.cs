@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using DBModels;
+using umlaut.Database.Models;
 
-namespace DBContext
+
+namespace umlaut.Database
+
 {
-    public class DataBaseContext: DbContext
+    public class UmlautDBContext: DbContext
     {
         private readonly string Host = "0xc00007b.site";
         private readonly string Port = "28008";
@@ -19,7 +21,7 @@ namespace DBContext
 
         public DbSet<Specializations> Specializations { get; set; }
 
-        public DataBaseContext()
+        public UmlautDBContext()
         {
             Database.EnsureCreated();
         }
