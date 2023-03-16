@@ -6,9 +6,9 @@ namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
     public class GraduateDBUpdater : IDBUpdater
     {
         private HHruAPI _api;
-        private GraduateRepository _repository;
+        private IGraduateRepository _repository;
 
-        public GraduateDBUpdater(HHruAPI api, GraduateRepository repository)
+        public GraduateDBUpdater(HHruAPI api, IGraduateRepository repository)
         {
             _api = api;
             _repository = repository;
@@ -17,7 +17,7 @@ namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
         public async Task Update()
         {
             var hrefList = await _api.GetProfileHrefs();
-            foreach (var href in hrefList.AsParallel())
+            foreach (var href in hrefList)
             {
                 if (!_repository.IsAlreadyExists(href))
                 {

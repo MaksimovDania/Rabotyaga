@@ -1,28 +1,24 @@
 ﻿using Quartz;
 using System.Threading.Tasks;
 using Umlaut.Database;
+using Umlaut.WebService.DBUpdaterService.DBUpdaters;
 
-namespace Umlaut.GraduateDBUpdaterBGService
+namespace Umlaut.WebService.DBUpdaterService
 {
     [DisallowConcurrentExecution]
     public class DBUpdateJob : IJob
     {
-        private HHruAPI _api;
-        private UmlautDBContext _context;
-        public DBUpdateJob(HHruAPI api, UmlautDBContext context)
+        private GraduateDBUpdater _updater;
+        public DBUpdateJob(GraduateDBUpdater updater)
         {
-            _api = api;
-            _context = context;
+            _updater = updater;
         }
 
         public Task Execute(IJobExecutionContext context)
         {
             var t = new Task(async () =>
             {
-            var g = await _api.GetGraduate("efd05ff10007c1d23a0039ed1f627367636773");
-                var a = _context.Faculties.Add(g.Faculty);
-                _context.SaveChanges();
-                Console.WriteLine(a);
+               await _updater.Update();
 
             } );
             t.Start();

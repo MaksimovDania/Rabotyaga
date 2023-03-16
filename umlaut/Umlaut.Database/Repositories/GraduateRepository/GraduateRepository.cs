@@ -8,25 +8,29 @@ namespace Umlaut.Database.Repositories.GraduateRepository
 
         public void CreateGraduate(Graduate newGraduate)
         {
-            newGraduate = IsUnique(newGraduate);
-            _context.Graduates.Add(newGraduate);
+            var graduate = IsUnique(newGraduate);
+            _context.Graduates.Add(graduate);
             _context.SaveChanges();
         }
 
         private Graduate IsUnique(Graduate graduate)
         {
-            if (_context.Graduates.Where(u => u.ResumeLink == graduate.ResumeLink).Count() > 0)
+            if (_context.Graduates.Any(u => u.ResumeLink == graduate.ResumeLink))
                 throw new InvalidOperationException("Such a graduate already exists");
-            if (_context.Faculties.Where(u => u.Faculty == graduate.Faculty.Faculty).Count() > 0)
+            if (_context.Faculties.Any(u => u.Faculty == graduate.Faculty.Faculty))
                 graduate.Faculty = _context.Faculties.FirstOrDefault(u => u.Faculty == graduate.Faculty.Faculty);
-            if (_context.Locations.Where(u => u.Location == graduate.Location.Location).Count() > 0)
+            if (_context.Locations.Any(u => u.Location == graduate.Location.Location))
                 graduate.Location = _context.Locations.FirstOrDefault(u => u.Location == graduate.Location.Location);
+            List<Specializations> specializations = new List<Specializations>();
             foreach (var item in graduate.Specialization)
-                if (_context.Specializations.Where(u => u.Specialization == item.Specialization).Count() > 0)
+                if (!_context.Specializations.Any(u => u.Specialization == item.Specialization))
                 {
-                    graduate.Specialization.Remove(item);
-                    graduate.Specialization.Add(_context.Specializations.FirstOrDefault(u => u.Specialization == item.Specialization));
-                }
+                    
+                    _context.Specializations.Add(item);
+                    specializations.Add(item);
+                } else
+                    specializations.Add(_context.Specializations.FirstOrDefault(u => u.Specialization == item.Specialization));
+            graduate.Specialization = specializations;
             return graduate;
         }
 

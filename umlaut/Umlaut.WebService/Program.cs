@@ -4,8 +4,9 @@ using AngleSharp.Html;
 using AngleSharp.Html.Parser;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
-using umlaut;
-using umlaut.GraduateDBUpdaterBGService;
+using Umlaut;
+using Umlaut.WebService.DBUpdaterService;
+using Umlaut.WebService.DBUpdaterService.DBUpdaters;
 using Umlaut.Database;
 using Umlaut.Database.Repositories.FacultyRepository;
 using Umlaut.Database.Repositories.GraduateRepository;
@@ -34,6 +35,7 @@ builder.Services.AddTransient<IFacultyRepository, FacultyRepository>();
 builder.Services.AddTransient<IGraduateRepository, GraduateRepository>();
 builder.Services.AddTransient<ILocationRepository, LocationRepositopy>();
 builder.Services.AddTransient<ISpecializationRepository, SpecializationRepositopy>();
+builder.Services.AddTransient<GraduateDBUpdater>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -44,7 +46,7 @@ builder.Services.AddQuartz(q =>
     q.ScheduleJob<DBUpdateJob>(trigger => trigger
             .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(1)))
             .WithSimpleSchedule(x => x
-                .WithIntervalInSeconds(100)
+                .WithIntervalInHours(10)
                 .RepeatForever())
         );
 });

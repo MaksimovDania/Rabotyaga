@@ -64,7 +64,7 @@ namespace Umlaut
             rez.Vacation = document.QuerySelector("div.resume-block__title-text-wrapper h2  span.resume-block__title-text[data-qa='resume-block-title-position']").InnerHtml;
             rez.Specialization = document.QuerySelectorAll("li.resume-block__specialization").Select(a => new Specializations { Specialization = a.InnerHtml}).ToList();
             var bmstu = document.QuerySelectorAll("div.resume-block[data-qa='resume-block-education'] div.bloko-columns-row div.resume-block-item-gap")
-                                .FirstOrDefault(a => a.QuerySelector("a").InnerHtml.Contains("Баумана"));
+                                .FirstOrDefault(a => a.QuerySelector("a").InnerHtml.Contains("Баумана")); //часто падает с нулем System.NullReferenceException: "Object reference not set to an instance of an object."
             rez.YearGraduation = int.Parse(bmstu.QuerySelector("div.bloko-column_l-2").InnerHtml);
             rez.Faculty = new Faculties { Faculty = bmstu.QuerySelector("div[data-qa='resume-block-education-organization']").InnerHtml };
 
@@ -105,7 +105,7 @@ namespace Umlaut
             //    links = links.Concat(list);
             //}
 
-            for (int i = 20; i < 25; i++)
+            for (int i = 31; i < 33; i++)
             {
                 links = links.Concat(await GetAllHrefsForAge(i));
             }

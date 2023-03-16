@@ -15,7 +15,7 @@ namespace Umlaut.Database.Repositories.LocationRepository
         {
             if (newLocation.Location == String.Empty)
                 throw new ArgumentException();
-            if (_context.Locations.Where(u => u.Location == newLocation.Location).Count() > 0)
+            if (_context.Locations.Any(u => u.Location == newLocation.Location))
                 throw new InvalidOperationException("Such a location already exists");
             _context.Locations.Add(newLocation);
             _context.SaveChanges();
@@ -24,7 +24,7 @@ namespace Umlaut.Database.Repositories.LocationRepository
 
         public void DeleteLocation(string deleteLocationStr)
         {
-            if (_context.Locations.Where(u => u.Location == deleteLocationStr).Count() == 0)
+            if (!_context.Locations.Any(u => u.Location == deleteLocationStr))
                 throw new InvalidOperationException("There is no such location");
             var deleteLocation = _context.Locations.FirstOrDefault(u => u.Location == deleteLocationStr);
             _context.Locations.Remove(deleteLocation);

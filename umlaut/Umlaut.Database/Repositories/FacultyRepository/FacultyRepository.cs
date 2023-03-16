@@ -10,7 +10,7 @@ namespace Umlaut.Database.Repositories.FacultyRepository
         {
             if (newFaculty.Faculty == String.Empty)
                 throw new ArgumentException();
-            if (_context.Faculties.Where(u => u.Faculty == newFaculty.Faculty).Count() > 0)
+            if (_context.Faculties.Any(u => u.Faculty == newFaculty.Faculty))
                 throw new InvalidOperationException("Such a faculty already exists");
             _context.Faculties.Add(newFaculty);
             _context.SaveChanges();
@@ -19,7 +19,7 @@ namespace Umlaut.Database.Repositories.FacultyRepository
 
         public void DeleteFaculty(string deleteFacultyStr)
         {
-            if (_context.Faculties.Where(u => u.Faculty == deleteFacultyStr).Count() == 0)
+            if (!_context.Faculties.Any(u => u.Faculty == deleteFacultyStr))
                 throw new InvalidOperationException("There is no such faculty");
             var deleteFaculty = _context.Faculties.FirstOrDefault(u => u.Faculty == deleteFacultyStr);
             _context.Faculties.Remove(deleteFaculty);

@@ -15,7 +15,7 @@ namespace Umlaut.Database.Repositories.SpecializationRepository
         {
             if (specialization.Specialization == String.Empty)
                 throw new ArgumentException();
-            if (_context.Specializations.Where(u => u.Specialization == specialization.Specialization).Count() > 0)
+            if (_context.Specializations.Any(u => u.Specialization == specialization.Specialization))
                 throw new InvalidOperationException("Such a specialization already exists");
             _context.Specializations.Add(specialization);
             _context.SaveChanges();
@@ -24,7 +24,7 @@ namespace Umlaut.Database.Repositories.SpecializationRepository
 
         public void DeleteSpecialization(string deleteSpecializationStr)
         {
-            if (_context.Specializations.Where(u => u.Specialization == deleteSpecializationStr).Count() == 0)
+            if (!_context.Specializations.Any(u => u.Specialization == deleteSpecializationStr))
                 throw new InvalidOperationException("There is no such specialization");
             var deleteSpecialization = _context.Specializations.FirstOrDefault(u => u.Specialization == deleteSpecializationStr);
             _context.Specializations.Remove(deleteSpecialization);
