@@ -2,7 +2,7 @@
 
 namespace Umlaut.Database.Repositories.GraduateRepository
 {
-    internal class GraduateRepository : BaseRepository, IGraduateRepository
+    public class GraduateRepository : BaseRepository, IGraduateRepository
     {
         public GraduateRepository(UmlautDBContext context) : base(context) { }
 

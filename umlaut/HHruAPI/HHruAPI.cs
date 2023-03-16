@@ -41,10 +41,12 @@ namespace umlaut
         public async Task<Graduate> GetGraduate(string href)
         {
             var rez = new Graduate();
+            rez.ResumeLink = href;
             var document = await GetResume(href);
             var title = document.QuerySelector("div.resume-header-title");
             rez.Gender = title.QuerySelector("span[data-qa='resume-personal-gender']").InnerHtml;
-            rez.Age = int.Parse(title.QuerySelector("span[data-qa='resume-personal-age'] span").InnerHtml.Substring(0, 2));
+            var a = title.QuerySelector("span[data-qa='resume-personal-age'] span").InnerHtml;
+            rez.Age = int.Parse(a.Substring(0, 2));
             rez.Location = new Locations { Location = title.QuerySelector("span[data-qa='resume-personal-address']").InnerHtml };
 
             var salaryRaw = document.QuerySelector("span.resume-block__salary"); // проверть на нуль и запарсить

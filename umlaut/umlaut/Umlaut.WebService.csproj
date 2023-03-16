@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HHruAPI\HHruAPI.csproj" />
+    <ProjectReference Include="..\HHruAPI\Umlaut.HHruAPI.csproj" />
     <ProjectReference Include="..\Umlaut.Database\Umlaut.Database.csproj" />
   </ItemGroup>
 

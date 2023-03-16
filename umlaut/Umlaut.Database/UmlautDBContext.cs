@@ -7,11 +7,8 @@ namespace Umlaut.Database
 {
     public class UmlautDBContext: DbContext
     {
-        private readonly string Host = "95.165.158.58";
-        private readonly string Port = "28009";
-        private readonly string Database_name = "GraduateDBtest";
-        private readonly string Username = "umlaut-super";
-        private readonly string Password = "";
+
+        public UmlautDBContext(DbContextOptions<UmlautDBContext> options) : base(options) { }
 
         public DbSet<Graduate> Graduates { get; set; }
 
@@ -20,15 +17,6 @@ namespace Umlaut.Database
         public DbSet<Locations> Locations { get; set; }
 
         public DbSet<Specializations> Specializations { get; set; }
-
-        public UmlautDBContext()
-        {
-            Database.EnsureCreated();
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseNpgsql($"Host={Host};Port={Port};Database={Database_name};Username={Username};Password={Password}");
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
