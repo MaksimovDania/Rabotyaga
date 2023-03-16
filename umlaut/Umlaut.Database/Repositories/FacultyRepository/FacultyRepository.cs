@@ -1,12 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Umlaut.Database.Models;
 
 namespace Umlaut.Database.Repositories.FacultyRepository
 {
-    internal class FacultyRepository
+    public class FacultyRepository : BaseRepository, IFacultyRepository
     {
+        public FacultyRepository(UmlautDBContext context) : base(context) { }
+
+        public void CreateFaculty(Faculties newFaculty)
+        {
+            if (newFaculty.Faculty == String.Empty)
+                throw new ArgumentException();
+            if (_context.Faculties.Where(u => u.Faculty == newFaculty.Faculty).Count() > 0)
+                throw new InvalidOperationException("Such a faculty already exists");
+            _context.Faculties.Add(newFaculty);
+            _context.SaveChanges();
+
+        }
+
+        public void DeleteFaculty(string deleteFacultyStr)
+        {
+            if (_context.Faculties.Where(u => u.Faculty == deleteFacultyStr).Count() == 0)
+                throw new InvalidOperationException("There is no such faculty");
+            var deleteFaculty = _context.Faculties.FirstOrDefault(u => u.Faculty == deleteFacultyStr);
+            _context.Faculties.Remove(deleteFaculty);
+            _context.SaveChanges();
+
+        }
+
+        public IEnumerable<Faculties> GetFacultiesList()
+        {
+            var list = _context.Faculties.ToList();
+            return list;
+        }
     }
 }

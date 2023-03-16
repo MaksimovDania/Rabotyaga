@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umlaut.Database.Models;
 
 namespace Umlaut.Database.Repositories.FacultyRepository
 {
-    internal interface IFacultyRepository
+    public interface IFacultyRepository
     {
+        IEnumerable<Faculties> GetFacultiesList();
+        void CreateFaculty(Faculties faculty);
+        void DeleteFaculty(string faculty);
     }
 }
