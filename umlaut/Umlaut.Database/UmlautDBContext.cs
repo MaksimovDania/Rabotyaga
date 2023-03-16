@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using DBModels;
+using Umlaut.Database.Models;
 
-namespace DBContext
+
+namespace Umlaut.Database
+
 {
-    public class DataBaseContext: DbContext
+    public class UmlautDBContext: DbContext
     {
-        private readonly string Host = "0xc00007b.site";
-        private readonly string Port = "28008";
-        private readonly string Database_name = "Umlaut";
-        private readonly string Username = "postgres";
-        private readonly string Password = "";
+
+        public UmlautDBContext(DbContextOptions<UmlautDBContext> options) : base(options) { }
 
         public DbSet<Graduate> Graduates { get; set; }
 
@@ -18,15 +17,6 @@ namespace DBContext
         public DbSet<Locations> Locations { get; set; }
 
         public DbSet<Specializations> Specializations { get; set; }
-
-        public DataBaseContext()
-        {
-            Database.EnsureCreated();
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseNpgsql($"Host={Host};Port={Port};Database={Database_name};Username={Username};Password={Password}");
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
