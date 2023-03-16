@@ -13,7 +13,7 @@ namespace Umlaut.Database.Repositories.GraduateRepository
             _context.SaveChanges();
         }
 
-        public Graduate IsUnique(Graduate graduate)
+        private Graduate IsUnique(Graduate graduate)
         {
             if (_context.Graduates.Where(u => u.ResumeLink == graduate.ResumeLink).Count() > 0)
                 throw new InvalidOperationException("Such a graduate already exists");
