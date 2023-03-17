@@ -44,7 +44,8 @@ namespace Umlaut
             rez.ResumeLink = href;
             var document = await GetResume(href);
             var title = document.QuerySelector("div.resume-header-title");
-            rez.Gender = title.QuerySelector("span[data-qa='resume-personal-gender']").InnerHtml;
+            var gender = title.QuerySelector("span[data-qa='resume-personal-gender']");
+            rez.Gender = gender == null ? "Не указан" : gender.InnerHtml;
             var a = title.QuerySelector("span[data-qa='resume-personal-age'] span").InnerHtml;
             rez.Age = int.Parse(a.Substring(0, 2));
             rez.Location = new Locations { Location = title.QuerySelector("span[data-qa='resume-personal-address']").InnerHtml };
