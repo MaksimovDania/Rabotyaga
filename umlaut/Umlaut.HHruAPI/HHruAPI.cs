@@ -17,7 +17,7 @@ namespace Umlaut
         private readonly HttpClient _httpClient = new();
         public async Task<IHtmlDocument> getByAgePage(int age, int page)
         {
-            var rez = await SendGetRequest($"https://hh.ru/search/resume?education_level=higher&education_level=unfinished_higher&university=38921&label=only_with_age&relocation=living_or_relocation&age_from={age}&age_to={age}&gender=unknown&text=&isDefaultArea=true&exp_period=all_time&logic=normal&pos=full_text&from=employer_index_header&search_period=&page={page}");
+            var rez = await SendGetRequest($"https://hh.ru/search/resume?education_level=higher&university=38921&label=only_with_age&relocation=living_or_relocation&age_from={age}&age_to={age}&gender=unknown&text=&isDefaultArea=true&exp_period=all_time&logic=normal&pos=full_text&from=employer_index_header&search_period=&page={page}");
             return parser.ParseDocument(await rez.Content.ReadAsStringAsync());
         }
 
@@ -40,36 +40,51 @@ namespace Umlaut
 
         public async Task<Graduate> GetGraduate(string href)
         {
-            var rez = new Graduate();
-            rez.ResumeLink = href;
-            var document = await GetResume(href);
-            var title = document.QuerySelector("div.resume-header-title");
-            var gender = title.QuerySelector("span[data-qa='resume-personal-gender']");
-            rez.Gender = gender == null ? "Не указан" : gender.InnerHtml;
-            var a = title.QuerySelector("span[data-qa='resume-personal-age'] span").InnerHtml;
-            rez.Age = int.Parse(a.Substring(0, 2));
-            rez.Location = new Locations { Location = title.QuerySelector("span[data-qa='resume-personal-address']").InnerHtml };
+            try
+            {
+                var rez = new Graduate();
+                rez.ResumeLink = href;
+                var document = await GetResume(href);
+                var title = document.QuerySelector("div.resume-header-title");
+                var gender = title.QuerySelector("span[data-qa='resume-personal-gender']");
+                rez.Gender = gender == null ? "Не указан" : gender.InnerHtml;
+                var a = title.QuerySelector("span[data-qa='resume-personal-age'] span").InnerHtml;
+                rez.Age = int.Parse(a.Substring(0, 2));
+                rez.Location = new Locations { Location = title.QuerySelector("span[data-qa='resume-personal-address']").InnerHtml };
 
-            var salaryRaw = document.QuerySelector("span.resume-block__salary");
-            if (salaryRaw is null)
-                rez.ExpectedSalary = 0;
-            else
-                rez.ExpectedSalary = int.Parse(Regex.Replace(salaryRaw.InnerHtml.Substring(0, salaryRaw.InnerHtml.IndexOf('<')), @"\s+", String.Empty));
+                var salaryRaw = document.QuerySelector("span.resume-block__salary");
+                if (salaryRaw is null)
+                    rez.ExpectedSalary = 0;
+                else
+                    rez.ExpectedSalary = int.Parse(Regex.Replace(salaryRaw.InnerHtml.Substring(0, salaryRaw.InnerHtml.IndexOf('<')), @"\s+", String.Empty));
 
-            var experienceRaw = document.QuerySelectorAll("span.resume-block__title-text_sub span").Select(a => a.InnerHtml).ToList();
-            if (experienceRaw.Any())
-                rez.Experience = int.Parse(experienceRaw[0].Substring(0, experienceRaw[0].IndexOf("<"))); // проверить что не месяцев
-            else
-                rez.Experience = 0;
+                var experienceRaw = document.QuerySelectorAll("span.resume-block__title-text_sub span").Select(a => a.InnerHtml).ToList();
+                if (experienceRaw.Any())
+                    rez.Experience = int.Parse(experienceRaw[0].Substring(0, experienceRaw[0].IndexOf("<"))); // проверить что не месяцев
+                else
+                    rez.Experience = 0;
 
-            rez.Vacation = document.QuerySelector("div.resume-block__title-text-wrapper h2  span.resume-block__title-text[data-qa='resume-block-title-position']").InnerHtml;
-            rez.Specialization = document.QuerySelectorAll("li.resume-block__specialization").Select(a => new Specializations { Specialization = a.InnerHtml}).ToList();
-            var bmstu = document.QuerySelectorAll("div.resume-block[data-qa='resume-block-education'] div.bloko-columns-row div.resume-block-item-gap").FirstOrDefault(a => a.InnerHtml.Contains("Баумана")); //часто падает с нулем System.NullReferenceException: "Object reference not set to an instance of an object."
-            rez.YearGraduation = int.Parse(bmstu.QuerySelector("div.bloko-column_l-2").InnerHtml);
-            var rawFac = bmstu.QuerySelector("div[data-qa='resume-block-education-organization']").InnerHtml.Replace(@"<!-- -->", "");
-            rez.Faculty = new Faculties { Faculty = rawFac };
+                rez.Vacation = document.QuerySelector("div.resume-block__title-text-wrapper h2  span.resume-block__title-text[data-qa='resume-block-title-position']").InnerHtml;
+                rez.Specialization = document.QuerySelectorAll("li.resume-block__specialization").Select(a => new Specializations { Specialization = a.InnerHtml }).ToList();
+                var bmstu = document.QuerySelectorAll("div.resume-block[data-qa='resume-block-education'] div.bloko-columns-row div.resume-block-item-gap")
+                    .FirstOrDefault(a => a.InnerHtml.Contains("Баумана") || a.InnerHtml.Contains("Bauman") || a.InnerHtml.Contains("МГТУ")); //часто падает с нулем System.NullReferenceException: "Object reference not set to an instance of an object."
+                rez.YearGraduation = int.Parse(bmstu.QuerySelector("div.bloko-column_l-2").InnerHtml);
+                var rawFac = bmstu.QuerySelector("div[data-qa='resume-block-education-organization']").InnerHtml.Replace(@"<!-- -->", "");
+                rez.Faculty = new Faculties { Faculty = rawFac };
 
-            return rez;
+                return rez;
+            } catch (Exception ex)
+            {
+                using (StreamWriter mainText = File.AppendText("HHErrors.txt"))
+                {
+                    mainText.WriteLine(ex.Message);
+                    if (ex.InnerException != null)
+                        mainText.WriteLine(ex.InnerException);
+                    mainText.WriteLine(href);
+                    mainText.WriteLine();
+                }
+            }
+            return null;
         }
         private async Task<IEnumerable<string>> GetAllHrefsForAge(int age)
         {
@@ -106,7 +121,7 @@ namespace Umlaut
             //    links = links.Concat(list);
             //}
 
-            for (int i = 32; i < 33; i++)
+            for (int i = 26; i < 36; i++)
             {
                 links = links.Concat(await GetAllHrefsForAge(i));
             }
