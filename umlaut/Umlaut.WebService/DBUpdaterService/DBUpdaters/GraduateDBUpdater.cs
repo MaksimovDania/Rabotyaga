@@ -15,8 +15,6 @@ namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
 
         public async Task Update()
         {
-            var g = await _api.GetGraduate("382de59e00080674320039ed1f574d30656464");
-            var hrefList = await _api.GetProfileHrefs();
             foreach (var href in hrefList.AsParallel())
             {
                 if (!_repository.IsAlreadyExists(href))
