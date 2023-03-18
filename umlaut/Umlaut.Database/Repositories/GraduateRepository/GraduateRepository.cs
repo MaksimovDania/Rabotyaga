@@ -25,7 +25,6 @@ namespace Umlaut.Database.Repositories.GraduateRepository
             foreach (var item in graduate.Specialization)
                 if (!_context.Specializations.Any(u => u.Specialization == item.Specialization))
                 {
-                    
                     _context.Specializations.Add(item);
                     specializations.Add(item);
                 } else
