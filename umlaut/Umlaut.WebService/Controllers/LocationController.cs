@@ -7,6 +7,11 @@ namespace Umlaut.WebService.Controllers
     public class LocationController : Controller
     {
         [HttpGet]
-        public async Task<IActionResult> GetLocations() { return View(); }
+        public async Task<IActionResult> GetLocations() 
+        {
+            IActionResult responce;
+            responce = Ok("smth");
+            return responce;
+        }
     }
 }

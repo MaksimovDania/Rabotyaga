@@ -6,10 +6,20 @@ namespace Umlaut.WebService.Controllers
     [Route("api/[controller]")]
     public class SpecializationController : Controller
     {
-        [HttpGet("salary/experience")]
-        public async Task<IActionResult> GetSalaryToExperienceRatio() { return View(); }
+        [HttpGet("{specializationId}/salary/experience")]
+        public async Task<IActionResult> GetSalaryToExperienceRatio(int specializationId) 
+        {
+            IActionResult responce;
+            responce = Ok($"{specializationId} + smth");
+            return responce; 
+        }
 
         [HttpGet("{specializationId}/statistics")]
-        public async Task<IActionResult> GetAverageValuesForCurrentSpecialization(int specializationId) { return View(); }
+        public async Task<IActionResult> GetAverageValuesForCurrentSpecialization(int specializationId) 
+        {
+            IActionResult responce;
+            responce = Ok($"{specializationId} + smth");
+            return responce;
+        }
     }
 }
