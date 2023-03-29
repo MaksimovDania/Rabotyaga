@@ -121,7 +121,7 @@ namespace Umlaut
             //    links = links.Concat(list);
             //}
 
-            for (int i = 26; i < 36; i++)
+            for (int i = 20; i < 80; i++)
             {
                 links = links.Concat(await GetAllHrefsForAge(i));
             }

@@ -17,9 +17,6 @@ namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
 
         public async Task Update()
         {
-            var g = await _api.GetGraduate("f057927e000401f2cd0039ed1f593976667330");
-            var flag = IsChineese(g);
-            _repository.CreateGraduate(g);
             var hrefList = await _api.GetProfileHrefs();
             foreach (var href in hrefList)
             {
