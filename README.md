@@ -1,3 +1,4 @@
+
 ## Rabotyaga project
 
 Rabotyaga это веб приложение по сбору и анализу резюме выпускиников МГТУ им Н.Е.Баумана на биржах труда. Приложение автоматически собирает резюме в базу данных и через веб-интерфейс выдает статистистичесие данные по резюме по запросу пользователя.
@@ -29,7 +30,11 @@ Specialization соотносится с Graduate связью многие ко
 
 Graduate содержит следующие поля: Id, Gender, Age, Vacation, ExpectedSalary, LocationID, YearGraduation, FacultyID, Experience, ResumeLink, SpecializationsIDs
 
-![alt text](/umlaut/Sourse/drawSQL-o-database.png)
+### Диаграммы 
+
+ - [ER-диаграмма](https://drive.google.com/file/d/12ql8CjPIX_W7wSLnD8Ok_hkWF3vYf1Q8/view?usp=sharing)   
+ - [IDEF0](https://drive.google.com/drive/folders/1U4vXqxNs9CMCdXwGGO1qLyQlFJST26ex?usp=share_link)
+ - [DFD](https://drive.google.com/drive/folders/1tu2Ceqd1-XmF41zV8_ra6jp_qrJHsWLB?usp=share_link)
 
 ### Краткое описание алгоритма работы написанного кода
 
@@ -37,6 +42,11 @@ Graduate содержит следующие поля: Id, Gender, Age, Vacation
 
 Класс DBController предоставляет интерфейс взаимодействия с базой данных.
 
+Классы, наследованные от BaseRepository реализуют заполнение базы данных
+
+Класс DBUpadateJob реализует background server, который автоматически обновляет базу данных раз в сутки
+
+Классы, наследованные от Controller, предоставляют интерфейс взаимодействия по API
 ### Календарный план
 
 <table><tbody><tr><th>26.02</th><td>Парсинг резюме, создание базы</td></tr><tr><th>19.03</th><td>Равертка базы, механизм автозаполнения</td></tr><tr><th>26.03</th><td>Создание диаграмм, описания в формате OpenAPI</td></tr><tr><th>16.04</th><td>Полная реализация бекенда</td></tr><tr><th>30.04</th><td>Дизайн и интерфейс фронтенда</td></tr><tr><th>…</th><td>…</td></tr></tbody></table>
