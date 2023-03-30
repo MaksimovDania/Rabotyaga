@@ -1,12 +1,10 @@
-﻿using AngleSharp;
-using AngleSharp.Browser;
-using AngleSharp.Dom;
-using AngleSharp.Html.Parser;
-using System;
+﻿using AngleSharp.Html.Parser;
 using AngleSharp.Html.Dom;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 using Umlaut.Database.Models;
+using System.Text;
+using System.Reflection.Metadata.Ecma335;
+using System.Net;
 
 namespace Umlaut
 {
@@ -46,33 +44,20 @@ namespace Umlaut
                 rez.ResumeLink = href;
                 var document = await GetResume(href);
                 var title = document.QuerySelector("div.resume-header-title");
-                var gender = title.QuerySelector("span[data-qa='resume-personal-gender']");
-                rez.Gender = gender == null ? "Не указан" : gender.InnerHtml;
-                var a = title.QuerySelector("span[data-qa='resume-personal-age'] span").InnerHtml;
-                rez.Age = int.Parse(a.Substring(0, 2));
-                rez.Location = new Locations { Location = title.QuerySelector("span[data-qa='resume-personal-address']").InnerHtml };
-
-                var salaryRaw = document.QuerySelector("span.resume-block__salary");
-                if (salaryRaw is null)
-                    rez.ExpectedSalary = 0;
-                else
-                    rez.ExpectedSalary = int.Parse(Regex.Replace(salaryRaw.InnerHtml.Substring(0, salaryRaw.InnerHtml.IndexOf('<')), @"\s+", String.Empty));
-
-                var experienceRaw = document.QuerySelectorAll("span.resume-block__title-text_sub span").Select(a => a.InnerHtml).ToList();
-                if (experienceRaw.Any())
-                    rez.Experience = int.Parse(experienceRaw[0].Substring(0, experienceRaw[0].IndexOf("<"))); // проверить что не месяцев
-                else
-                    rez.Experience = 0;
-
+                rez.Gender = ParseGender(title.QuerySelector("span[data-qa='resume-personal-gender']").InnerHtml);
+                rez.Age = int.Parse(title.QuerySelector("span[data-qa='resume-personal-age'] span").InnerHtml.Substring(0, 2));
+                rez.Location = new Locations { Location = ParseLocation(title.QuerySelector("span[data-qa='resume-personal-address']").InnerHtml)};
+                rez.ExpectedSalary = ParseSalary(document.QuerySelector("span.resume-block__salary"));
+                rez.Experience = ParseExperience(document.QuerySelector("div.resume-block[data-qa='resume-block-experience'] h2 span"));
                 rez.Vacation = document.QuerySelector("div.resume-block__title-text-wrapper h2  span.resume-block__title-text[data-qa='resume-block-title-position']").InnerHtml;
-                rez.Specialization = document.QuerySelectorAll("li.resume-block__specialization").Select(a => new Specializations { Specialization = a.InnerHtml }).ToList();
+                rez.Specialization = document.QuerySelectorAll("li.resume-block__specialization").Select(a => new Specializations { Specialization = ParseSpecialization(a.InnerHtml)}).ToList();
                 var bmstu = document.QuerySelectorAll("div.resume-block[data-qa='resume-block-education'] div.bloko-columns-row div.resume-block-item-gap")
-                    .FirstOrDefault(a => a.InnerHtml.Contains("Баумана") || a.InnerHtml.Contains("Bauman") || a.InnerHtml.Contains("МГТУ")); //часто падает с нулем System.NullReferenceException: "Object reference not set to an instance of an object."
+                    .FirstOrDefault(a => a.InnerHtml.Contains("university=38921"));
                 rez.YearGraduation = int.Parse(bmstu.QuerySelector("div.bloko-column_l-2").InnerHtml);
                 var rawFac = bmstu.QuerySelector("div[data-qa='resume-block-education-organization']").InnerHtml.Replace(@"<!-- -->", "");
                 rez.Faculty = new Faculties { Faculty = rawFac };
 
-                return rez;
+                return FromChineese(rez);
             } catch (Exception ex)
             {
                 using (StreamWriter mainText = File.AppendText("HHErrors.txt"))
@@ -108,28 +93,129 @@ namespace Umlaut
         {
             IEnumerable<string> links = new List<string>();
 
-            //List<Task<IEnumerable<string>>> tasks = new();
-            //for (int i = 20; i < 30; i++)
-            //{
-            //   tasks.Add(GetAllHrefsForAge(i));
-            //}
-
-            //IEnumerable<string>[] lists = await Task.WhenAll(tasks);
-
-            //foreach (var list in lists)
-            //{
-            //    links = links.Concat(list);
-            //}
-
-            for (int i = 20; i < 80; i++)
+            for (int i = 18; i < 80; i++)
             {
                 links = links.Concat(await GetAllHrefsForAge(i));
             }
-
-
             return links;
         }
 
+        private Graduate FromChineese(Graduate g)
+        {
+            g.Faculty.Faculty = UTF8ToWin1251(g.Faculty.Faculty).Replace("?", "");
+            g.Gender = UTF8ToWin1251(g.Gender).Replace("?", ""); ;
+            g.Location.Location = UTF8ToWin1251(g.Location.Location).Replace("?", ""); 
+            g.Vacation = UTF8ToWin1251(g.Vacation).Replace("?", "");
+            foreach(var spec in g.Specialization)
+                spec.Specialization = UTF8ToWin1251(spec.Specialization).Replace("?", "");
+            return g;
+        }
+
+        private string UTF8ToWin1251(string sourceStr)
+        {
+            Encoding utf8 = Encoding.UTF8;
+            Encoding win1251 = Encoding.GetEncoding("windows-1251");
+            byte[] utf8Bytes = utf8.GetBytes(sourceStr);
+            byte[] win1251Bytes = Encoding.Convert(utf8, win1251, utf8Bytes);
+            return win1251.GetString(win1251Bytes);
+        }
+
+        private string TranslateLocation(string loc) => loc switch
+            {
+                "Balashikha" => "Балашиха",
+                "Batumi" => "Батуми",
+                "Bulgaria" => "Болгария",
+                "Egypt" => "Египет",
+                "Fryazino" => "Фрязино",
+                "Great Britain" => "Великобритания",
+                "Israel" => "Израиль",
+                "Kazan" => "Казань",
+                "Krasnodar" => "Краснодар",
+                "Moscow" => "Москва",
+                "Saint Petersburg" => "Санкт-Петербург",
+                "Sochi" => "Сочи",
+                "USA" => "США",
+                "Veliky Novgorod" => "Великий Новгород",
+                _ => loc
+            };
+
+        private string ParseGender(string gen) => gen switch
+            {
+                "Мужчина" => gen,
+                "Женщина" => gen,
+                "Male" => "Мужчина",
+                "Female" => "Женщина",
+                 _ => gen
+            };
+
+        private string ParseSpecialization(string str)
+        {
+            if (!Regex.IsMatch(str, "[а-яА-Я]"))
+            {
+                return TranslateSpecialization(str);
+            }
+            return str;
+        }
+
+        private string TranslateSpecialization(string spec) => spec switch
+        {
+            "Accountant" => "Бухгалтер",
+            "Analyst" => "Аналитик",
+            "Designer, artist" => "Дизайнер, художник",
+            "Economist" => "Экономист",
+            "Game designer" => "Гейм-дизайнер",
+            "Head of production" => "Начальник производства",
+            "Head of sales" => "Руководитель отдела продаж",
+            "Information security specialist" => "Специалист по информационной безопасности",
+            "Journalist, correspondent" => "Журналист, корреспондент",
+            "System engineer" => "Системный инженер",
+            "System administrator" => "Системный администратор",
+            "Programmer, developer" => "Программист, разработчик",
+            "Quality engineer" => "Инженер по качеству",
+            "Sales manager, account manager" => "Менеджер по продажам, менеджер по работе с клиентами",
+            "Tester" => "Тестировщик",
+            "Data scientist" => "Дата-сайентист",
+            _ => spec
+        };
+
+        private string ParseLocation(string str)
+        {
+            if (!Regex.IsMatch(str, "[а-яА-Я]"))
+            {
+                return TranslateLocation(str);
+            }
+            return str;
+        }
+
+        private int ParseSalary(AngleSharp.Dom.IElement salary)
+        {
+            if (salary == null) return 0;
+            var str = salary.InnerHtml;
+            double normal = int.Parse(Regex.Replace(str.Substring(0, str.IndexOf('<')), @"\s+", String.Empty));
+            var currency = Regex.Match(str, @"(?<=\>)([^&\s]*?)(?=\<)").Value;
+            return (int)(normal * GetExchangeRate(currency));
+        }
+
+        private Double GetExchangeRate(string currency) => currency switch
+        {   
+            "руб." => 1,
+            "RUB" => 1,
+            "EUR" => 82.9,
+            "USD" => 78,
+            "AZN" => 45.27,
+            "KZT" => 0.17,
+            _ => 1,
+        };
+
+        private int ParseExperience(AngleSharp.Dom.IElement exp)
+        {
+            if (exp == null) return 0;
+            var list = exp.QuerySelectorAll("span").Select(a => a.InnerHtml).ToList();
+            if (list[0].Contains("years") || list[0].Contains("год") || list[0].Contains("годa") || list[0].Contains("лет"))
+                return int.Parse(list[0].Substring(0, list[0].IndexOf("<")));
+            else 
+                return int.Parse(list[0].Substring(0, list[0].IndexOf("<"))) > 5 ? 1 : 0;
+        }
 
     }
 }

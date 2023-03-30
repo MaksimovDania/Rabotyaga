@@ -1,6 +1,4 @@
 ﻿using Umlaut.Database.Repositories.GraduateRepository;
-using Umlaut.Database.Models;
-using System.Text;
 
 namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
 {
@@ -47,26 +45,5 @@ namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
             }
         }
 
-        private bool IsChineese(Graduate g)
-        {
-            var f = (g.ResumeLink == UTF8ToWin1251(g.ResumeLink));
-            f = (g.Faculty.Faculty == UTF8ToWin1251(g.Faculty.Faculty));
-            f = (g.Gender == UTF8ToWin1251(g.Gender));
-            f = (g.Location.Location == UTF8ToWin1251(g.Location.Location));
-            f = (g.Vacation == UTF8ToWin1251(g.Vacation));
-            var rr = UTF8ToWin1251(g.Vacation);
-            return (g.ResumeLink == UTF8ToWin1251(g.ResumeLink)) && (g.Faculty.Faculty == UTF8ToWin1251(g.Faculty.Faculty))
-                && (g.Gender == UTF8ToWin1251(g.Gender)) && (g.Location.Location == UTF8ToWin1251(g.Location.Location))
-                && (g.Vacation == UTF8ToWin1251(g.Vacation)) ? false : true;
-        }
-
-        private string UTF8ToWin1251(string sourceStr)
-        {
-            Encoding utf8 = Encoding.UTF8;
-            Encoding win1251 = Encoding.GetEncoding("windows-1251");
-            byte[] utf8Bytes = utf8.GetBytes(sourceStr);
-            byte[] win1251Bytes = Encoding.Convert(utf8, win1251, utf8Bytes);
-            return win1251.GetString(win1251Bytes);
-        }
     }
 }
