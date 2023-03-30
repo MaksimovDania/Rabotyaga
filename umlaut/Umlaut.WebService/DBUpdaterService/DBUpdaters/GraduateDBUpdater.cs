@@ -15,7 +15,8 @@ namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
 
         public async Task Update()
         {
-            foreach (var href in hrefList.AsParallel())
+            var hrefList = await _api.GetProfileHrefs();
+            foreach (var href in hrefList)
             {
                 if (!_repository.IsAlreadyExists(href))
                 {
