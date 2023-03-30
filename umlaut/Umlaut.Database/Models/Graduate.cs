@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DBModels
+namespace Umlaut.Database.Models
 {
     public class Graduate
     {
