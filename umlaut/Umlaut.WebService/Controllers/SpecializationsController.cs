@@ -4,7 +4,7 @@ namespace Umlaut.WebService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SpecializationController : Controller
+    public class SpecializationsController : Controller
     {
         [HttpGet("{specializationId}/salary/experience")]
         public async Task<IActionResult> GetSalaryToExperienceRatio(int specializationId) 

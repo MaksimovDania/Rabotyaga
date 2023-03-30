@@ -4,7 +4,7 @@ namespace Umlaut.WebService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class LocationController : Controller
+    public class LocationsController : Controller
     {
         [HttpGet]
         public async Task<IActionResult> GetLocations() 
