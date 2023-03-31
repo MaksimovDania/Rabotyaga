@@ -32,7 +32,7 @@ Graduate содержит следующие поля: Id, Gender, Age, Vacation
 
 ### Диаграммы 
 
- - [ER-диаграмма](https://drive.google.com/file/d/12ql8CjPIX_W7wSLnD8Ok_hkWF3vYf1Q8/view?usp=sharing)   
+ - [ER-диаграмма](https://drive.google.com/drive/folders/1QAQ-khZvYv12Og0E33OxcGcLPuPJlvfM?usp=sharing)   
  - [IDEF0](https://drive.google.com/drive/folders/1U4vXqxNs9CMCdXwGGO1qLyQlFJST26ex?usp=share_link)
  - [DFD](https://drive.google.com/drive/folders/1tu2Ceqd1-XmF41zV8_ra6jp_qrJHsWLB?usp=share_link)
 
