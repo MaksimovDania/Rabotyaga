@@ -6,7 +6,7 @@ namespace Umlaut.WebService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class FacultyController : Controller
+    public class FacultiesController : Controller
     {
         [HttpGet("{facultyId}/statistics")]
         public async Task<IActionResult> GetAverageValuesForCurrentFaculty(int facultyId) 
@@ -45,6 +45,14 @@ namespace Umlaut.WebService.Controllers
         {
             IActionResult responce;
             responce = Ok($"{facultyId} + smth");
+            return responce;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllFaculties()
+        {
+            IActionResult responce;
+            responce = Ok("smth");
             return responce;
         }
     }
