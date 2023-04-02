@@ -6,9 +6,9 @@ namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
     public class GraduateDBUpdater : IDBUpdater
     {
         private HHruAPI _api;
-        private IGraduateRepository _repository;
+        private IFacultyRepository _repository;
 
-        public GraduateDBUpdater(HHruAPI api, IGraduateRepository repository)
+        public GraduateDBUpdater(HHruAPI api, IFacultyRepository repository)
         {
             _api = api;
             _repository = repository;
@@ -21,7 +21,8 @@ namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
             //var list = _repository.GetFacultiesList().Select(f => f.Faculty);
             //foreach (var faculty in list)
             //{
-            //    mainText.WriteLine($"{faculty}\t{_api.ClassificateFaculty(faculty)}");
+            //    var fac = _api.ClassificateFaculty(faculty);
+            //    mainText.WriteLine($"{fac}\t{faculty}");
             //}
             //mainText.Close();
             var hrefList = await _api.GetProfileHrefs();
