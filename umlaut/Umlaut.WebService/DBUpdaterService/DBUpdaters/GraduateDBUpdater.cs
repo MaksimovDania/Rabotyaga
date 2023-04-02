@@ -1,13 +1,14 @@
-﻿using Umlaut.Database.Repositories.GraduateRepository;
+﻿using Umlaut.Database.Repositories.FacultyRepository;
+using Umlaut.Database.Repositories.GraduateRepository;
 
 namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
 {
     public class GraduateDBUpdater : IDBUpdater
     {
         private HHruAPI _api;
-        private IGraduateRepository _repository;
+        private IFacultyRepository _repository;
 
-        public GraduateDBUpdater(HHruAPI api, IGraduateRepository repository)
+        public GraduateDBUpdater(HHruAPI api, IFacultyRepository repository)
         {
             _api = api;
             _repository = repository;
@@ -15,7 +16,16 @@ namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
 
         public async Task Update()
         {
-            foreach (var href in hrefList.AsParallel())
+            //StreamWriter mainText = File.AppendText("clasificateTest.tsv");
+
+            //var list = _repository.GetFacultiesList().Select(f => f.Faculty);
+            //foreach (var faculty in list)
+            //{
+            //    mainText.WriteLine($"{faculty}\t{_api.ClassificateFaculty(faculty)}");
+            //}
+            //mainText.Close();
+            var hrefList = await _api.GetProfileHrefs();
+            foreach (var href in hrefList)
             {
                 if (!_repository.IsAlreadyExists(href))
                 {

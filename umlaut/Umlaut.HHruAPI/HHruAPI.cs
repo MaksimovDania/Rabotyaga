@@ -5,12 +5,27 @@ using Umlaut.Database.Models;
 using System.Text;
 using System.Reflection.Metadata.Ecma335;
 using System.Net;
+using System.Text.Json;
+using Quickenshtein;
+using Newtonsoft.Json;
 
 namespace Umlaut
 {
     public class HHruAPI
     {
         private HtmlParser parser = new HtmlParser();
+
+        dynamic faculies;
+        const int minDistance = 5;
+        const int maxDistance = 35;
+        public HHruAPI()
+        {
+            using (StreamReader reader = new StreamReader("faculties.json"))
+            {
+                string json = reader.ReadToEnd();
+                faculies = JsonConvert.DeserializeObject(json);
+            }
+        }
 
         private readonly HttpClient _httpClient = new();
         public async Task<IHtmlDocument> getByAgePage(int age, int page)
@@ -46,19 +61,20 @@ namespace Umlaut
                 var title = document.QuerySelector("div.resume-header-title");
                 rez.Gender = ParseGender(title.QuerySelector("span[data-qa='resume-personal-gender']").InnerHtml);
                 rez.Age = int.Parse(title.QuerySelector("span[data-qa='resume-personal-age'] span").InnerHtml.Substring(0, 2));
-                rez.Location = new Locations { Location = ParseLocation(title.QuerySelector("span[data-qa='resume-personal-address']").InnerHtml)};
+                rez.Location = new Locations { Location = ParseLocation(title.QuerySelector("span[data-qa='resume-personal-address']").InnerHtml) };
                 rez.ExpectedSalary = ParseSalary(document.QuerySelector("span.resume-block__salary"));
                 rez.Experience = ParseExperience(document.QuerySelector("div.resume-block[data-qa='resume-block-experience'] h2 span"));
                 rez.Vacation = document.QuerySelector("div.resume-block__title-text-wrapper h2  span.resume-block__title-text[data-qa='resume-block-title-position']").InnerHtml;
-                rez.Specialization = document.QuerySelectorAll("li.resume-block__specialization").Select(a => new Specializations { Specialization = ParseSpecialization(a.InnerHtml)}).ToList();
+                rez.Specialization = document.QuerySelectorAll("li.resume-block__specialization").Select(a => new Specializations { Specialization = ParseSpecialization(a.InnerHtml) }).ToList();
                 var bmstu = document.QuerySelectorAll("div.resume-block[data-qa='resume-block-education'] div.bloko-columns-row div.resume-block-item-gap")
                     .FirstOrDefault(a => a.InnerHtml.Contains("university=38921"));
                 rez.YearGraduation = int.Parse(bmstu.QuerySelector("div.bloko-column_l-2").InnerHtml);
                 var rawFac = bmstu.QuerySelector("div[data-qa='resume-block-education-organization']").InnerHtml.Replace(@"<!-- -->", "");
-                rez.Faculty = new Faculties { Faculty = rawFac };
+                rez.Faculty = new Faculties { Faculty = ClassificateFaculty(rawFac) };
 
                 return FromChineese(rez);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 using (StreamWriter mainText = File.AppendText("HHErrors.txt"))
                 {
@@ -78,9 +94,9 @@ namespace Umlaut
             var document = await getByAgePage(age, 0);
             var batons = document.QuerySelectorAll("a.bloko-button span").Select(span => span.InnerHtml).ToList();
             links = links.Concat(document.QuerySelectorAll("a.serp-item__title").Select(elem => elem.GetAttribute("href").Substring(8, 38)));
-            if (int.TryParse(batons[^2], out  int pagesNumber))
+            if (int.TryParse(batons[^2], out int pagesNumber))
             {
-                for(int i = 1; i < pagesNumber; i++)
+                for (int i = 1; i < pagesNumber; i++)
                 {
                     document = await getByAgePage(age, i);
                     links = links.Concat(document.QuerySelectorAll("a.serp-item__title").Select(elem => elem.GetAttribute("href").Substring(8, 38)));
@@ -93,7 +109,7 @@ namespace Umlaut
         {
             IEnumerable<string> links = new List<string>();
 
-            for (int i = 18; i < 80; i++)
+            for (int i = 18; i < 23; i++)
             {
                 links = links.Concat(await GetAllHrefsForAge(i));
             }
@@ -104,9 +120,9 @@ namespace Umlaut
         {
             g.Faculty.Faculty = UTF8ToWin1251(g.Faculty.Faculty).Replace("?", "");
             g.Gender = UTF8ToWin1251(g.Gender).Replace("?", ""); ;
-            g.Location.Location = UTF8ToWin1251(g.Location.Location).Replace("?", ""); 
+            g.Location.Location = UTF8ToWin1251(g.Location.Location).Replace("?", "");
             g.Vacation = UTF8ToWin1251(g.Vacation).Replace("?", "");
-            foreach(var spec in g.Specialization)
+            foreach (var spec in g.Specialization)
                 spec.Specialization = UTF8ToWin1251(spec.Specialization).Replace("?", "");
             return g;
         }
@@ -121,32 +137,32 @@ namespace Umlaut
         }
 
         private string TranslateLocation(string loc) => loc switch
-            {
-                "Balashikha" => "Балашиха",
-                "Batumi" => "Батуми",
-                "Bulgaria" => "Болгария",
-                "Egypt" => "Египет",
-                "Fryazino" => "Фрязино",
-                "Great Britain" => "Великобритания",
-                "Israel" => "Израиль",
-                "Kazan" => "Казань",
-                "Krasnodar" => "Краснодар",
-                "Moscow" => "Москва",
-                "Saint Petersburg" => "Санкт-Петербург",
-                "Sochi" => "Сочи",
-                "USA" => "США",
-                "Veliky Novgorod" => "Великий Новгород",
-                _ => loc
-            };
+        {
+            "Balashikha" => "Балашиха",
+            "Batumi" => "Батуми",
+            "Bulgaria" => "Болгария",
+            "Egypt" => "Египет",
+            "Fryazino" => "Фрязино",
+            "Great Britain" => "Великобритания",
+            "Israel" => "Израиль",
+            "Kazan" => "Казань",
+            "Krasnodar" => "Краснодар",
+            "Moscow" => "Москва",
+            "Saint Petersburg" => "Санкт-Петербург",
+            "Sochi" => "Сочи",
+            "USA" => "США",
+            "Veliky Novgorod" => "Великий Новгород",
+            _ => loc
+        };
 
         private string ParseGender(string gen) => gen switch
-            {
-                "Мужчина" => gen,
-                "Женщина" => gen,
-                "Male" => "Мужчина",
-                "Female" => "Женщина",
-                 _ => gen
-            };
+        {
+            "Мужчина" => gen,
+            "Женщина" => gen,
+            "Male" => "Мужчина",
+            "Female" => "Женщина",
+            _ => gen
+        };
 
         private string ParseSpecialization(string str)
         {
@@ -197,7 +213,7 @@ namespace Umlaut
         }
 
         private Double GetExchangeRate(string currency) => currency switch
-        {   
+        {
             "руб." => 1,
             "RUB" => 1,
             "EUR" => 82.9,
@@ -213,9 +229,33 @@ namespace Umlaut
             var list = exp.QuerySelectorAll("span").Select(a => a.InnerHtml).ToList();
             if (list[0].Contains("years") || list[0].Contains("год") || list[0].Contains("годa") || list[0].Contains("лет"))
                 return int.Parse(list[0].Substring(0, list[0].IndexOf("<")));
-            else 
+            else
                 return int.Parse(list[0].Substring(0, list[0].IndexOf("<"))) > 5 ? 1 : 0;
         }
 
+        public string ClassificateFaculty(string faculty)
+        {
+            int minLev = 10000;
+            string title = faculty;
+            foreach (dynamic fac in faculies)
+            {
+                foreach (string exaxtName in fac["Exact name"])
+                {
+                    if (faculty.Contains(exaxtName))
+                        return fac.Title;
+                }
+                foreach (string possibleName in fac["Possible names"])
+                {
+                    int dist = Levenshtein.GetDistance(possibleName, faculty);
+                    if (dist < minLev)
+                    {
+                        title = fac.Title;
+                        minLev = dist;
+                    }
+                }
+            }
+            return UTF8ToWin1251(title).Replace("?", "");
+
+        }
     }
 }
