@@ -6,9 +6,9 @@ namespace Umlaut.WebService.DBUpdaterService.DBUpdaters
     public class GraduateDBUpdater : IDBUpdater
     {
         private HHruAPI _api;
-        private IFacultyRepository _repository;
+        private IGraduateRepository _repository;
 
-        public GraduateDBUpdater(HHruAPI api, IFacultyRepository repository)
+        public GraduateDBUpdater(HHruAPI api, IGraduateRepository repository)
         {
             _api = api;
             _repository = repository;
